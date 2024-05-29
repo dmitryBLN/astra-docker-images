@@ -1,0 +1,56 @@
+{
+    "listeners": {
+        "*:8080": {
+            "pass": "routes"
+        }
+    },
+    "applications": {
+        "zabbix": {
+            "type": "php",
+            "root": "/usr/share/zabbix",
+            "index": "index.php",
+            "processes": 4,
+            "options": {
+                "admin": {
+                    "upload_max_filesize": "100M",
+                    "post_max_size": "16M",
+                    "max_execution_time": "300",
+                    "max_input_time": "300"
+                }
+            }
+        }
+    },
+    "routes": [
+        {
+            "match": {
+                "uri": [
+                    "/app/*",
+                    "/conf/*",
+                    "/include/*",
+                    "/local/*",
+                    "/locale/*",
+                    "/vendor/*"
+                ]
+            },
+            "action": {
+                "return": 404
+            }
+        },
+        {
+            "match": {
+                "uri": ["*.php"]
+            },
+            "action": {
+                "pass": "applications/zabbix"
+            }
+        },
+        {
+            "action": {
+                "share": "/usr/share/zabbix",
+                "fallback": {
+                    "pass": "applications/zabbix"
+                }
+            }
+        }
+    ]
+}
